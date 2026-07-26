@@ -24,9 +24,11 @@ jobs:
           java-version: 21
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-home-cache-cleanup: true
+          # Disable cleanup: Gradle 8.9+ make removeUnusedEntriesOlderThan write-only,
+          # and setup-gradle's post-step would otherwise mark the job failed.
+          cache-cleanup: never
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -35,17 +37,25 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          ./gradlew zipRelease
-          ./gradlew zipDebug
+          ./gradlew zipRelease zipDebug
 
       - name: Prepare artifact
         if: success()
         id: prepareArtifact
         run: |
-          releaseName=`ls module/release/Tricky*Store*v*-release.zip | awk -F '(/|.zip)' '{print $3}'` && echo "releaseName=$releaseName" >> $GITHUB_OUTPUT
-          debugName=`ls module/release/Tricky*Store*v*-debug.zip | awk -F '(/|.zip)' '{print $3}'` && echo "debugName=$debugName" >> $GITHUB_OUTPUT
-          unzip module/release/Tricky*Store*v*-release.zip -d module-release
-          unzip module/release/Tricky*Store*v*-debug.zip -d module-debug
+          set -euo pipefail
+          ls -la module/release/
+          release_zip=$(ls module/release/Tricky*Store*v*-release.zip | head -n1)
+          debug_zip=$(ls module/release/Tricky*Store*v*-debug.zip | head -n1)
+          releaseName=$(basename "$release_zip" .zip)
+          debugName=$(basename "$debug_zip" .zip)
+          echo "releaseName=$releaseName" >> "$GITHUB_OUTPUT"
+          echo "debugName=$debugName" >> "$GITHUB_OUTPUT"
+          unzip -q "$release_zip" -d module-release
+          unzip -q "$debug_zip" -d module-debug
+          # sanity: version string in module.prop
+          grep -E '^version=' module-release/module.prop || true
+          cat module-release/module.prop
 
       - name: Upload release
         uses: actions/upload-artifact@v4
