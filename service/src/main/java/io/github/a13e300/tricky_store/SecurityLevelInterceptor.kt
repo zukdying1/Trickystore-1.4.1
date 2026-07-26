@@ -240,12 +240,15 @@ class SecurityLevelInterceptor(
         a.keyParameter.value = KeyParameterValue.integer(params.keySize)
         a.securityLevel = level
         authorizations.add(a)
-        a = Authorization()
-        a.keyParameter = KeyParameter()
-        a.keyParameter.tag = Tag.EC_CURVE
-        a.keyParameter.value = KeyParameterValue.ecCurve(params.ecCurve)
-        a.securityLevel = level
-        authorizations.add(a)
+        // EC_CURVE only present for EC keys; RSA keys have null ecCurve
+        params.ecCurve?.let { curve ->
+            a = Authorization()
+            a.keyParameter = KeyParameter()
+            a.keyParameter.tag = Tag.EC_CURVE
+            a.keyParameter.value = KeyParameterValue.ecCurve(curve)
+            a.securityLevel = level
+            authorizations.add(a)
+        }
         a = Authorization()
         a.keyParameter = KeyParameter()
         a.keyParameter.tag = Tag.NO_AUTH_REQUIRED
