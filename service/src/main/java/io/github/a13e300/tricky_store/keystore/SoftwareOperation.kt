@@ -186,18 +186,15 @@ class SoftwareOperation(
     ) {
         constructor(params: Array<KeyParameter>) : this(
             // Use getters (not static tag discriminators named algorithm/digest/...)
-            algorithm = params.findTag(Tag.ALGORITHM)?.value?.getAlgorithm() ?: 0,
-            keySize = params.findTag(Tag.KEY_SIZE)?.value?.getInteger() ?: 0,
-            ecCurve = params.findTag(Tag.EC_CURVE)?.value?.getEcCurve(),
+            algorithm = params.firstOrNull { it.tag == Tag.ALGORITHM }?.value?.getAlgorithm() ?: 0,
+            keySize = params.firstOrNull { it.tag == Tag.KEY_SIZE }?.value?.getInteger() ?: 0,
+            ecCurve = params.firstOrNull { it.tag == Tag.EC_CURVE }?.value?.getEcCurve(),
             digest = params.filter { it.tag == Tag.DIGEST }.map { it.value.getDigest() },
             padding = params.filter { it.tag == Tag.PADDING }.map { it.value.getPaddingMode() },
             blockMode = params.filter { it.tag == Tag.BLOCK_MODE }.map { it.value.getBlockMode() },
             purpose = params.filter { it.tag == Tag.PURPOSE }.map { it.value.getKeyPurpose() },
         )
     }
-
-    private fun Array<KeyParameter>.findTag(tag: Int): KeyParameter? =
-        firstOrNull { it.tag == tag }
 }
 
 /** Binder interface for SoftwareOperation. */

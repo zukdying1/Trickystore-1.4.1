@@ -263,28 +263,28 @@ class SecurityLevelInterceptor(
         a = Authorization()
         a.keyParameter = KeyParameter()
         a.keyParameter.tag = Tag.OS_VERSION
-        a.keyParameter.value = KeyParameterValue.integer(UtilKt.getOsVersion())
+        a.keyParameter.value = KeyParameterValue.integer(osVersion)
         a.securityLevel = level
         authorizations.add(a)
         // OS_PATCHLEVEL
         a = Authorization()
         a.keyParameter = KeyParameter()
         a.keyParameter.tag = Tag.OS_PATCHLEVEL
-        a.keyParameter.value = KeyParameterValue.integer(UtilKt.getOsPatchLevel(uid))
+        a.keyParameter.value = KeyParameterValue.integer(getOsPatchLevel(uid))
         a.securityLevel = level
         authorizations.add(a)
         // VENDOR_PATCHLEVEL
         a = Authorization()
         a.keyParameter = KeyParameter()
         a.keyParameter.tag = Tag.VENDOR_PATCHLEVEL
-        a.keyParameter.value = KeyParameterValue.integer(UtilKt.getVendorPatchLevel(uid))
+        a.keyParameter.value = KeyParameterValue.integer(getVendorPatchLevel(uid))
         a.securityLevel = level
         authorizations.add(a)
         // BOOT_PATCHLEVEL
         a = Authorization()
         a.keyParameter = KeyParameter()
         a.keyParameter.tag = Tag.BOOT_PATCHLEVEL
-        a.keyParameter.value = KeyParameterValue.integer(UtilKt.getBootPatchLevel(uid))
+        a.keyParameter.value = KeyParameterValue.integer(getBootPatchLevel(uid))
         a.securityLevel = level
         authorizations.add(a)
         // CREATION_DATETIME
